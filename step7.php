@@ -40,7 +40,7 @@
 	  )
 	)
   );
-  $ch = curl_init('https://vision.googleapis.com/v1/images:annotate?key=AIzaSyCiyGiCfjzzPR1JS8PrAxcsQWHdbycVwmg');// 換 key                                                                      
+  $ch = curl_init('https://vision.googleapis.com/v1/images:annotate?key=AIzaSyA6p-Diw44465ZxrrZG-MvUZFrlRwMpG6c');// 換 key                                                                      
   curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");                                                                     
   curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($post_data));                                                                  
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);                                                                      
@@ -58,8 +58,8 @@
 	"messages" => array (
 	  array (
 		"type" => "text",
-		//"text" => $ans_txt
-		"text" => $result -> responses[0] -> fullTextAnnotation -> text
+		"text" => $ans_txt
+		//"text" => $result -> responses[0] -> fullTextAnnotation -> text
 	  )
 	)
   );
