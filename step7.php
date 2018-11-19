@@ -21,6 +21,58 @@
   $imagefile = fopen($imageId.".jpeg", "w+") or die("Unable to open file!");
   fwrite($imagefile, $json_content); 
   fclose($imagefile); //將圖片存在server上
-			
+  // 以下 Google Vision API
+  $header[] = "Content-Type: application/json";
+  $post_data = array (
+	"requests" => array (
+	  array (
+		"image" => array (
+		  "source" => array (
+			"imageUri" => "http://139.59.123.8/class/learning/".$imageId.".jpeg"
+		  )
+		),
+		"features" => array (
+		  array (
+			"type" => "TEXT_DETECTION",
+			"maxResults" => 1
+		  )
+		)
+	  )
+	)
+  );
+  $ch = curl_init('https://vision.googleapis.com/v1/images:annotate?key=AIzaSyA6p-Diw44465ZxrrZG-MvUZFrlRwMpG6c');// 換 key                                                                      
+  curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");                                                                     
+  curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($post_data));                                                                  
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);                                                                      
+  curl_setopt($ch, CURLOPT_HTTPHEADER, $header);                                                                                                   
+  $result = json_decode(curl_exec($ch));
+  $result_ary = mb_split("\n",$result -> responses[0] -> fullTextAnnotation -> text);
+  $ans_txt = "這張發票沒用了，你又製造了一張垃圾";
+  foreach ($result_ary as $val) {
+	if($val == "JS-07510912"){
+	  $ans_txt = "恭喜您中獎啦，快分紅!!";
+	}
+  }
+  $response = array (
+	"replyToken" => $sender_replyToken,
+	"messages" => array (
+	  array (
+		"type" => "text",
+		"text" => $ans_txt
+		//"text" => $result -> responses[0] -> fullTextAnnotation -> text
+	  )
+	)
+  );
   
+  
+  fwrite($myfile, "\xEF\xBB\xBF".json_encode($response)); //在字串前面加上\xEF\xBB\xBF轉成utf8格式
+  $header[] = "Content-Type: application/json";
+  $header[] = "Authorization: Bearer jdZhCvbKzhF9eWFQv0SdQKfxa2PN2hVTTxFGFR+YMWC6vwUF4ZgNAE9niU165dTOU+8Ju4CgaXVAlMl6Yj9zrSkKvQvSaLWBSi3Sj7rj+okG8CkZaumQ4s14G/RmuM7gzsyEelQyOIODAPPBPzl/PgdB04t89/1O/w1cDnyilFU=";
+  $ch = curl_init("https://api.line.me/v2/bot/message/reply");
+  curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+  curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($response));                                                                  
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);                                                                      
+  curl_setopt($ch, CURLOPT_HTTPHEADER, $header);                                                                                                   
+  $result = curl_exec($ch);
+  curl_close($ch);
 ?>
